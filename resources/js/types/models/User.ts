@@ -1,9 +1,17 @@
+export type UserType = 'admin' | 'manager' | 'cashier' | 'waiter' | 'user'
+
 export interface User {
   id: number
   name: string
+  username: string
+  user_type: UserType
   email: string
   email_verified_at: string | null
-  tenant_id: number | null
+  language: string
+  contact_no: string | null
+  address: string | null
+  business_id: number | null
+  status: boolean
   created_at: string
   updated_at: string
   roles?: Role[]
@@ -21,6 +29,9 @@ export interface Role {
 export interface Permission {
   id: number
   name: string
-  display_name: string
+  guard_name: string
+  display_name: string | null
   description: string | null
+  created_at: string
+  updated_at: string
 }
