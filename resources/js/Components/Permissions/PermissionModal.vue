@@ -3,11 +3,14 @@ import { ref, watch, computed } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import { X } from 'lucide-vue-next'
 import type { Permission } from '@/types/models/User'
+import type { Module } from '@/types/models/Module'
+import { FormInput, TextArea, Button, SearchableDropdown } from '@/Components/shared'
 
 interface Props {
   open: boolean
   permission?: Permission | null
   mode: 'create' | 'edit'
+  modules: Module[]
 }
 
 const props = defineProps<Props>()
@@ -20,6 +23,7 @@ const form = useForm({
   name: '',
   display_name: '',
   description: '',
+  module_id: '',
 })
 
 // Watch for permission changes to populate form
@@ -30,6 +34,7 @@ watch(
       form.name = newPermission.name
       form.display_name = newPermission.display_name || ''
       form.description = newPermission.description || ''
+      form.module_id = newPermission.module_id
     } else {
       form.reset()
     }
@@ -54,6 +59,13 @@ const modalTitle = computed(() => {
 
 const submitButtonText = computed(() => {
   return props.mode === 'create' ? 'Create' : 'Update'
+})
+
+const moduleOptions = computed(() => {
+  return props.modules.map(module => ({
+    value: module.id,
+    label: module.module_name
+  }))
 })
 
 function handleSubmit() {
@@ -112,107 +124,93 @@ function handleClose() {
             @click.stop
           >
             <!-- Modal Header -->
-            <div class="flex items-center justify-between p-6 border-b border-gray-200">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
-                  <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
+            <div class="card-header">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded flex items-center justify-center" style="background-color: rgba(255, 136, 0, 0.1);">
+                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <h2 class="text-lg font-semibold text-gray-900">{{ modalTitle }}</h2>
                 </div>
-                <h2 class="text-lg font-semibold text-gray-900">{{ modalTitle }}</h2>
+                <button
+                  type="button"
+                  @click="handleClose"
+                  :disabled="form.processing"
+                  class="text-gray-400 hover:text-gray-600 transition-base"
+                >
+                  <X class="w-5 h-5" />
+                </button>
               </div>
-              <button
-                type="button"
-                @click="handleClose"
-                :disabled="form.processing"
-                class="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X class="w-5 h-5" />
-              </button>
             </div>
 
             <!-- Modal Body -->
-            <form @submit.prevent="handleSubmit" class="p-6 space-y-4">
+            <form @submit.prevent="handleSubmit" class="card-body space-y-4">
               <!-- Permission Name -->
               <div>
-                <label for="permission-name" class="block text-sm font-medium text-gray-700 mb-1">
-                  Permission Name <span class="text-red-500">*</span>
-                </label>
-                <input
-                  id="permission-name"
+                <FormInput
                   v-model="form.name"
-                  type="text"
+                  label="Permission Name"
                   placeholder="e.g., users.create, products.view"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  :class="{ 'border-red-500': form.errors.name }"
+                  :error="form.errors.name"
                   :disabled="form.processing"
                   required
                 />
-                <p v-if="form.errors.name" class="mt-1 text-sm text-red-600">
-                  {{ form.errors.name }}
-                </p>
                 <p class="mt-1 text-xs text-gray-500">
                   Use lowercase letters, numbers, hyphens, and dots only
                 </p>
               </div>
 
               <!-- Display Name -->
-              <div>
-                <label for="display-name" class="block text-sm font-medium text-gray-700 mb-1">
-                  Display Name <span class="text-red-500">*</span>
-                </label>
-                <input
-                  id="display-name"
-                  v-model="form.display_name"
-                  type="text"
-                  placeholder="e.g., Create Users, View Products"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  :class="{ 'border-red-500': form.errors.display_name }"
-                  :disabled="form.processing"
-                  required
-                />
-                <p v-if="form.errors.display_name" class="mt-1 text-sm text-red-600">
-                  {{ form.errors.display_name }}
-                </p>
-              </div>
+              <FormInput
+                v-model="form.display_name"
+                label="Display Name"
+                placeholder="e.g., Create Users, View Products"
+                :error="form.errors.display_name"
+                :disabled="form.processing"
+                required
+              />
+
+              <!-- Module Selection -->
+              <SearchableDropdown
+                v-model="form.module_id"
+                label="Module"
+                :options="moduleOptions"
+                placeholder="Select module..."
+                :error="form.errors.module_id"
+                :disabled="form.processing"
+                required
+              />
 
               <!-- Description -->
-              <div>
-                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  v-model="form.description"
-                  rows="3"
-                  placeholder="Brief description of what this permission allows..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
-                  :class="{ 'border-red-500': form.errors.description }"
-                  :disabled="form.processing"
-                />
-                <p v-if="form.errors.description" class="mt-1 text-sm text-red-600">
-                  {{ form.errors.description }}
-                </p>
-              </div>
+              <TextArea
+                v-model="form.description"
+                label="Description"
+                placeholder="Brief description of what this permission allows..."
+                :error="form.errors.description"
+                :disabled="form.processing"
+                :rows="3"
+              />
 
               <!-- Modal Footer -->
               <div class="flex items-center justify-end gap-3 pt-4">
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
                   @click="handleClose"
                   :disabled="form.processing"
-                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
+                  variant="primary"
+                  :loading="form.processing"
                   :disabled="form.processing"
-                  class="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  <span v-if="!form.processing">{{ submitButtonText }}</span>
-                  <span v-else>Processing...</span>
-                </button>
+                  {{ submitButtonText }}
+                </Button>
               </div>
             </form>
           </div>

@@ -2,8 +2,8 @@
 
 namespace App\Repositories\Contracts;
 
+use App\Models\Permission;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Spatie\Permission\Models\Permission;
 
 interface PermissionRepositoryInterface
 {

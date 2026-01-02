@@ -24,6 +24,7 @@ class PermissionController extends Controller
         // Get filter parameters
         $filters = [
             'guard_name' => $request->get('guard_name'),
+            'module_id' => $request->get('module_id'),
             'created_from' => $request->get('created_from'),
             'created_to' => $request->get('created_to'),
         ];
@@ -36,6 +37,7 @@ class PermissionController extends Controller
                 'search' => $search,
                 'per_page' => $perPage,
                 'guard_name' => $filters['guard_name'],
+                'module_id' => $filters['module_id'],
                 'created_from' => $filters['created_from'],
                 'created_to' => $filters['created_to'],
             ],
@@ -53,12 +55,15 @@ class PermissionController extends Controller
                 'string',
                 'max:255',
                 'unique:permissions,name',
-                'regex:/^[a-z0-9\-\.]+$/', 
+                'regex:/^[a-z0-9\-\.]+$/',
             ],
             'display_name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
+            'module_id' => 'required|integer|exists:modules,id',
         ], [
             'name.regex' => 'Permission name must only contain lowercase letters, numbers, hyphens, and dots.',
+            'module_id.required' => 'Module is required.',
+            'module_id.exists' => 'Selected module does not exist.',
         ]);
 
         try {
@@ -85,8 +90,11 @@ class PermissionController extends Controller
             ],
             'display_name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
+            'module_id' => 'required|integer|exists:modules,id',
         ], [
             'name.regex' => 'Permission name must only contain lowercase letters, numbers, hyphens, and dots.',
+            'module_id.required' => 'Module is required.',
+            'module_id.exists' => 'Selected module does not exist.',
         ]);
 
         try {

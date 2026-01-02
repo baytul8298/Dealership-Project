@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 interface Props {
   label: string
@@ -8,25 +8,43 @@ interface Props {
   placeholder?: string
   required?: boolean
   error?: string
+  disabled?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   placeholder: '',
   required: false,
+  disabled: false,
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | number]
 }>()
 
+const isFocused = ref(false)
+const touched = ref(false)
+
 const hasValue = computed(() => {
   return props.modelValue !== '' && props.modelValue !== null && props.modelValue !== undefined
+})
+
+const isActive = computed(() => {
+  return isFocused.value || hasValue.value
 })
 
 function handleInput(event: Event) {
   const target = event.target as HTMLInputElement
   emit('update:modelValue', target.value)
+}
+
+function handleFocus() {
+  touched.value = true
+  isFocused.value = true
+}
+
+function handleBlur() {
+  isFocused.value = false
 }
 </script>
 
@@ -36,19 +54,33 @@ function handleInput(event: Event) {
       :type="type"
       :value="modelValue"
       @input="handleInput"
-      :placeholder="placeholder"
+      @focus="handleFocus"
+      @blur="handleBlur"
+      :placeholder="isActive ? placeholder : ''"
       :required="required"
-      class="w-full px-3 py-2.5 pt-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-0 focus:border-orange-500 transition-colors peer placeholder-transparent"
-      :class="{ 'border-red-500 focus:border-red-500': error }"
+      :disabled="disabled"
+      class="w-full px-4 py-3 border rounded-md transition-all duration-200 outline-none bg-white peer"
+      :class="{
+        'border-orange-500 border-2': touched && isFocused && !error,
+        'border-red-500 border-2': error,
+        'border-gray-300': (!touched || !isFocused) && !error,
+        'opacity-60 cursor-not-allowed': disabled
+      }"
     />
     <label
-      class="absolute left-3 -top-2.5 bg-white px-1 text-sm font-medium transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2.5 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-orange-500"
-      :class="hasValue ? 'text-orange-500 -top-2.5 text-sm' : 'text-gray-600'"
+      class="absolute left-4 transition-all duration-200 pointer-events-none bg-white px-1"
+      :class="{
+        '-top-2.5 text-xs font-medium': isActive,
+        'top-1/2 -translate-y-1/2 text-base': !isActive,
+        'text-red-500': error,
+        'text-orange-500': touched && isFocused && !error,
+        'text-gray-500': (!touched || !isFocused) && !error
+      }"
     >
       {{ label }}
-      <span v-if="required" class="text-red-500">*</span>
+      <span v-if="required" class="text-red-500 ml-0.5">*</span>
     </label>
-    <p v-if="error" class="mt-1 text-sm text-red-600">
+    <p v-if="error" class="mt-1 text-sm text-red-500">
       {{ error }}
     </p>
   </div>

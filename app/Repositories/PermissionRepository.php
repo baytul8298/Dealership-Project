@@ -2,9 +2,9 @@
 
 namespace App\Repositories;
 
+use App\Models\Permission;
 use App\Repositories\Contracts\PermissionRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Spatie\Permission\Models\Permission;
 
 class PermissionRepository implements PermissionRepositoryInterface
 {
@@ -18,7 +18,7 @@ class PermissionRepository implements PermissionRepositoryInterface
      */
     public function paginate(int $perPage = 15, ?string $search = null, array $filters = []): LengthAwarePaginator
     {
-        $query = Permission::query();
+        $query = Permission::query()->with('module');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -31,6 +31,11 @@ class PermissionRepository implements PermissionRepositoryInterface
         // Apply guard name filter
         if (!empty($filters['guard_name'])) {
             $query->where('guard_name', $filters['guard_name']);
+        }
+
+        // Apply module filter
+        if (!empty($filters['module_id'])) {
+            $query->where('module_id', $filters['module_id']);
         }
 
         // Apply created from filter
@@ -53,7 +58,7 @@ class PermissionRepository implements PermissionRepositoryInterface
      */
     public function all()
     {
-        return Permission::orderBy('name')->get();
+        return Permission::with('module')->orderBy('name')->get();
     }
 
     /**
@@ -64,7 +69,7 @@ class PermissionRepository implements PermissionRepositoryInterface
      */
     public function findById(int $id): ?Permission
     {
-        return Permission::find($id);
+        return Permission::with('module')->find($id);
     }
 
     /**
@@ -80,6 +85,7 @@ class PermissionRepository implements PermissionRepositoryInterface
             'display_name' => $data['display_name'] ?? $data['name'],
             'description' => $data['description'] ?? null,
             'guard_name' => $data['guard_name'] ?? 'web',
+            'module_id' => $data['module_id'],
         ]);
     }
 
@@ -98,9 +104,10 @@ class PermissionRepository implements PermissionRepositoryInterface
             'name' => $data['name'] ?? $permission->name,
             'display_name' => $data['display_name'] ?? $permission->display_name,
             'description' => $data['description'] ?? $permission->description,
+            'module_id' => $data['module_id'] ?? $permission->module_id,
         ]);
 
-        return $permission->fresh();
+        return $permission->fresh(['module']);
     }
 
     /**

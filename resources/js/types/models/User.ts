@@ -1,3 +1,5 @@
+import type { Module } from './Module'
+
 export type UserType = 'admin' | 'manager' | 'cashier' | 'waiter' | 'user'
 
 export interface User {
@@ -21,9 +23,14 @@ export interface User {
 export interface Role {
   id: number
   name: string
+  guard_name: string
+  role_type: string | null
   display_name: string
   description: string | null
   permissions?: Permission[]
+  permissions_count?: number
+  created_at: string
+  updated_at: string
 }
 
 export interface Permission {
@@ -32,6 +39,8 @@ export interface Permission {
   guard_name: string
   display_name: string | null
   description: string | null
+  module_id: number
+  module?: Module
   created_at: string
   updated_at: string
 }

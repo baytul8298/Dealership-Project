@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Head, useForm, Link } from '@inertiajs/vue3'
 import AuthLayout from '@/Layouts/AuthLayout.vue'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import { Eye, EyeOff, Lock } from 'lucide-vue-next'
+import { ref } from 'vue'
 
 const form = useForm({
   email: '',
@@ -11,6 +11,8 @@ const form = useForm({
 })
 
 const showPassword = ref(false)
+const emailFocused = ref(false)
+const passwordFocused = ref(false)
 
 const submit = () => {
   form.post('/login', {
@@ -46,59 +48,100 @@ const togglePasswordVisibility = () => {
     <!-- Login Form -->
     <form @submit.prevent="submit" class="space-y-5">
       <!-- Email/Username Field -->
-      <div>
+      <div class="relative">
         <input
           id="email"
           v-model="form.email"
           type="email"
-          placeholder="E-mail/Username"
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-gray-700 placeholder-gray-400"
-          :class="{ 'border-red-500': form.errors.email }"
+          @focus="emailFocused = true"
+          @blur="emailFocused = false"
+          :placeholder="emailFocused || form.email ? 'Enter your email or username' : ''"
+          class="w-full px-4 py-3 border rounded-md transition-all duration-200 outline-none bg-white"
+          :class="{
+            'border-orange-500 border-2': emailFocused && !form.errors.email,
+            'border-red-500 border-2': form.errors.email,
+            'border-gray-300': !emailFocused && !form.errors.email
+          }"
           required
           autofocus
         />
-        <p v-if="form.errors.email" class="text-red-500 text-xs mt-1.5 ml-1">
+        
+        <label
+          class="absolute left-4 transition-all duration-200 pointer-events-none bg-white px-1"
+          :class="{
+            '-top-2.5 text-xs font-medium': emailFocused || form.email,
+            'top-1/2 -translate-y-1/2 text-base': !emailFocused && !form.email,
+            'text-red-500': form.errors.email,
+            'text-orange-500': emailFocused && !form.errors.email,
+            'text-gray-500': !emailFocused && !form.errors.email
+          }"
+        >
+          E-mail/Username
+          <span class="text-red-500 ml-0.5">*</span>
+        </label>
+
+        <p v-if="form.errors.email" class="mt-1 text-sm text-red-500">
           {{ form.errors.email }}
         </p>
       </div>
 
       <!-- Password Field -->
-      <div>
-        <div class="relative">
-          <input
-            id="password"
-            v-model="form.password"
-            :type="showPassword ? 'text' : 'password'"
-            placeholder="Password"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-gray-700 placeholder-gray-400 pr-12"
-            :class="{ 'border-red-500': form.errors.password }"
-            required
-          />
-          <button
-            type="button"
-            @click="togglePasswordVisibility"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <Eye v-if="!showPassword" class="w-5 h-5" />
-            <EyeOff v-else class="w-5 h-5" />
-          </button>
-        </div>
-        <p v-if="form.errors.password" class="text-red-500 text-xs mt-1.5 ml-1">
+      <div class="relative">
+        <input
+          id="password"
+          v-model="form.password"
+          :type="showPassword ? 'text' : 'password'"
+          @focus="passwordFocused = true"
+          @blur="passwordFocused = false"
+          :placeholder="passwordFocused || form.password ? 'Enter your password' : ''"
+          class="w-full px-4 py-3 border rounded-md transition-all duration-200 outline-none bg-white pr-12"
+          :class="{
+            'border-orange-500 border-2': passwordFocused && !form.errors.password,
+            'border-red-500 border-2': form.errors.password,
+            'border-gray-300': !passwordFocused && !form.errors.password
+          }"
+          required
+        />
+        
+        <label
+          class="absolute left-4 transition-all duration-200 pointer-events-none bg-white px-1"
+          :class="{
+            '-top-2.5 text-xs font-medium': passwordFocused || form.password,
+            'top-1/2 -translate-y-1/2 text-base': !passwordFocused && !form.password,
+            'text-red-500': form.errors.password,
+            'text-orange-500': passwordFocused && !form.errors.password,
+            'text-gray-500': !passwordFocused && !form.errors.password
+          }"
+        >
+          Password
+          <span class="text-red-500 ml-0.5">*</span>
+        </label>
+
+        <button
+          type="button"
+          @click="togglePasswordVisibility"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors"
+        >
+          <Eye v-if="!showPassword" class="w-5 h-5" />
+          <EyeOff v-else class="w-5 h-5" />
+        </button>
+
+        <p v-if="form.errors.password" class="mt-1 text-sm text-red-500">
           {{ form.errors.password }}
         </p>
       </div>
 
       <!-- Remember Me & Forgot Password -->
       <div class="flex items-center justify-between">
-        <label class="flex items-center cursor-pointer">
+        <label class="flex items-center cursor-pointer group">
           <input
             v-model="form.remember"
             type="checkbox"
-            class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+            class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500 focus:ring-2 cursor-pointer"
           />
-          <span class="ml-2 text-sm text-gray-600">Remember me</span>
+          <span class="ml-2 text-sm text-gray-600 group-hover:text-gray-800 transition-colors">Remember me</span>
         </label>
-        <Link href="/forgot-password" class="text-sm text-orange-500 hover:text-orange-600 font-medium">
+        <Link href="/forgot-password" class="text-sm text-orange-500 hover:text-orange-600 font-medium transition-colors">
           Forgot Password?
         </Link>
       </div>
@@ -117,7 +160,7 @@ const togglePasswordVisibility = () => {
       <div class="text-center pt-4 border-t border-gray-200">
         <p class="text-sm text-gray-600">
           Don't have an account?
-          <Link href="/register" class="text-orange-500 hover:text-orange-600 font-semibold ml-1">
+          <Link href="/register" class="text-orange-500 hover:text-orange-600 font-semibold ml-1 transition-colors">
             Sign up
           </Link>
         </p>

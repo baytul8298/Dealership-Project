@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useNotificationsStore } from '@/stores/notifications'
-import { X, CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-vue-next'
+import { AlertTriangle, CheckCircle, Info, X, XCircle } from 'lucide-vue-next'
 
 const notificationsStore = useNotificationsStore()
 
@@ -35,7 +35,7 @@ const iconColorMap = {
       leave-active-class="transition ease-in duration-200"
       leave-from-class="translate-x-0 opacity-100"
       leave-to-class="translate-x-full opacity-0"
-    >
+      >
       <div
         v-for="notification in notificationsStore.notifications"
         :key="notification.id"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
-import { Home, Bell, Maximize, Sun, Moon, Globe } from 'lucide-vue-next'
+import { Bell, Globe, Home, Maximize, Moon, Sun } from 'lucide-vue-next'
+import { ref } from 'vue'
 import UserMenu from './UserMenu.vue'
 
 const isDark = ref(false)
@@ -29,11 +29,11 @@ const toggleFullscreen = () => {
     </div>
 
     <!-- Right side - Actions and User Menu -->
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 header-icon-right">
       <!-- Home Icon -->
       <Link
         href="/dashboard"
-        class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+        class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors header-icon-child"
         title="Home"
       >
         <Home class="w-5 h-5 text-gray-600" />
@@ -41,7 +41,7 @@ const toggleFullscreen = () => {
 
       <!-- Notifications -->
       <button
-        class="relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+        class="relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors header-icon-child"
         title="Notifications"
       >
         <Bell class="w-5 h-5 text-gray-600" />
@@ -51,7 +51,7 @@ const toggleFullscreen = () => {
       <!-- Fullscreen -->
       <button
         @click="toggleFullscreen"
-        class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+        class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors header-icon-child"
         title="Fullscreen"
       >
         <Maximize class="w-5 h-5 text-gray-600" />
@@ -60,7 +60,7 @@ const toggleFullscreen = () => {
       <!-- Theme Toggle -->
       <button
         @click="toggleTheme"
-        class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+        class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors header-icon-child"
         title="Toggle Theme"
       >
         <Sun v-if="!isDark" class="w-5 h-5 text-gray-600" />
@@ -69,7 +69,7 @@ const toggleFullscreen = () => {
 
       <!-- Language Selector -->
       <button
-        class="flex items-center gap-1 px-3 h-10 rounded-lg hover:bg-gray-100 transition-colors"
+        class="flex items-center gap-1 px-3 h-10 rounded-lg hover:bg-gray-100 transition-colors header-icon-child"
         title="Language"
       >
         <Globe class="w-4 h-4 text-gray-600" />

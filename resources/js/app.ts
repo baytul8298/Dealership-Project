@@ -6,6 +6,7 @@ import { pinia } from '@/stores'
 import { useAuthStore } from '@/stores/auth'
 import { useTenantStore } from '@/stores/tenant'
 import type { PageProps } from '@/types/inertia'
+import GlobalBadge from '@/Components/shared/GlobalBadge.vue'
 
 // Click-away directive
 const clickAwayDirective = {
@@ -36,6 +37,7 @@ createInertiaApp({
             .use(plugin)
             .use(pinia)
             .directive('click-away', clickAwayDirective)
+            .component('GlobalBadge', GlobalBadge)
 
         // Initialize stores with data from Inertia
         const authStore = useAuthStore()

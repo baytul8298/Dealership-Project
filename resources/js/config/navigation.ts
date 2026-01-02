@@ -131,6 +131,10 @@ export const systemNavigationConfig: NavigationItem[] = [
         name: 'Permissions',
         href: '/permissions',
       },
+      {
+        name: 'Modules',
+        href: '/modules',
+      },
     ],
   },
 ]
