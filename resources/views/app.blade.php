@@ -4,7 +4,13 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+        <link rel="shortcut icon" type="image/png" href="{{ asset('favicon.png') }}">
+        <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
+
+        @vite(['resources/css/app.css', 'resources/js/app.ts'])
         @inertiaHead
     </head>
     <body class="antialiased">

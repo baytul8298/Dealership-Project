@@ -1,9 +1,19 @@
+import type { Module } from './Module'
+
+export type UserType = 'admin' | 'manager' | 'cashier' | 'waiter' | 'user'
+
 export interface User {
   id: number
   name: string
+  username: string
+  user_type: UserType
   email: string
   email_verified_at: string | null
-  tenant_id: number | null
+  language: string
+  contact_no: string | null
+  address: string | null
+  business_id: number | null
+  status: boolean
   created_at: string
   updated_at: string
   roles?: Role[]
@@ -13,14 +23,24 @@ export interface User {
 export interface Role {
   id: number
   name: string
+  guard_name: string
+  role_type: string | null
   display_name: string
   description: string | null
   permissions?: Permission[]
+  permissions_count?: number
+  created_at: string
+  updated_at: string
 }
 
 export interface Permission {
   id: number
   name: string
-  display_name: string
+  guard_name: string
+  display_name: string | null
   description: string | null
+  module_id: number
+  module?: Module
+  created_at: string
+  updated_at: string
 }

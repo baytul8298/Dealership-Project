@@ -24,7 +24,7 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended('/dashboard');
+            return redirect()->intended('/dashboard')->with('success', 'Welcome back! You have successfully logged in.');
         }
 
         throw ValidationException::withMessages([
@@ -37,6 +37,6 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+        return redirect('/login')->with('success', 'You have been successfully logged out.');
     }
 }
